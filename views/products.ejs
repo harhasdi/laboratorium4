@@ -1,0 +1,26 @@
+<%- include('partials/header') %>
+
+<h1>Lista Produktów</h1>
+<a href="/products/add">+ Dodaj nowy produkt</a>
+
+<ul>
+  <% products.forEach(product => { %>
+    <li>
+      <strong><%= product.name %></strong> —
+      <a href="/products/<%= product.name %>">Szczegóły</a>
+      <button onclick="deleteProduct('<%= product.name %>')">Usuń</button>
+    </li>
+  <% }) %>
+</ul>
+
+<script>
+  function deleteProduct(name) {
+    fetch(`/products/${name}`, {
+      method: 'DELETE'
+    }).then(() => {
+      window.location.reload();
+    });
+  }
+</script>
+
+<%- include('partials/footer') %>

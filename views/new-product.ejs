@@ -1,0 +1,14 @@
+<%- include('partials/header') %>
+
+<h1>Ostatnio dodany produkt</h1>
+
+<% if (product) { %>
+  <h2><%= product.name %></h2>
+  <p><%= product.description %></p>
+<% } else { %>
+  <p>Brak produktów.</p>
+<% } %>
+
+<a href="/products">Powrót</a>
+
+<%- include('partials/footer') %>
