@@ -1,26 +1,30 @@
-<%- include('partials/header') %>
+<%- include('navigation') %>
+<link rel="stylesheet" href="/styles/main.css">
 
-<h1>Lista Produktów</h1>
-<a href="/products/add">+ Dodaj nowy produkt</a>
+<h1>Product List</h1>
+<a href="/add" class="btn">Add New Product</a>
 
-<ul>
+<div class="product-container">
   <% products.forEach(product => { %>
-    <li>
-      <strong><%= product.name %></strong> —
-      <a href="/products/<%= product.name %>">Szczegóły</a>
-      <button onclick="deleteProduct('<%= product.name %>')">Usuń</button>
-    </li>
+    <div class="product-card">
+      <h3><%= product.name %></h3>
+      <p>Price: $<%= product.price.toFixed(2) %></p>
+      <button onclick="addToCart('<%= product.name %>')">Add to cart</button>
+      <form action="/delete/<%= product.name %>" method="POST" onsubmit="return confirm('Are you sure?')">
+        <button type="submit">Delete</button>
+      </form>
+    </div>
   <% }) %>
-</ul>
+</div>
 
 <script>
-  function deleteProduct(name) {
-    fetch(`/products/${name}`, {
-      method: 'DELETE'
-    }).then(() => {
-      window.location.reload();
+  async function addToCart(name) {
+    const res = await fetch('/cart/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
     });
+    const data = await res.json();
+    document.querySelector('.navigation__badge').innerText = data.cartCount;
   }
 </script>
-
-<%- include('partials/footer') %>

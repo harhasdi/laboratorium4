@@ -1,33 +1,20 @@
 const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
-
-const homeRoutes = require('./routing/home');
-const logoutRoutes = require('./routing/logout');
-const productRoutes = require('./routing/products');
-
 const app = express();
-const PORT = 3000;
+const productsRoutes = require('./routing/products');
+const { connectToDb } = require('./utils/database');
 
-// Middleware
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.json());
 
-// View engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
 
-// Routing
-app.use('/', homeRoutes);
-app.use('/logout', logoutRoutes);
-app.use('/products', productRoutes);
+app.use('/products', productsRoutes);
 
-// 404 page
-app.use((req, res) => {
-  res.status(404).render('404');
-});
 
-app.listen(PORT, () => {
-  console.log(`Serwer działa na http://localhost:${PORT}`);
+connectToDb((err) => {
+  if (!err) {
+    app.listen(3000, () => {
+      console.log('Сервер працює на http://localhost:3000');
+    });
+  } else {
+    console.error('Помилка підключення до бази даних:', err);
+  }
 });

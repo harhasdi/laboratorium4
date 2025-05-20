@@ -1,41 +1,28 @@
 const Product = require('../models/Product');
-const STATUS_CODE = require('../constants/statusCode');
+const Cart = require('../models/Cart');
 
-const getProductsView = (req, res) => {
-  const products = Product.getAll();
-  res.render('products', { products });
+exports.getAllProducts = async (req, res) => {
+  const products = await Product.getAll();
+  const cart = await Cart.getCart();
+  res.render('product', { products, cartCount: cart.totalCount });
 };
 
-const getAddProductView = (req, res) => {
+exports.getAddProductForm = (req, res) => {
   res.render('add-product');
 };
 
-const addNewProduct = (req, res) => {
-  const { name, description } = req.body;
-  Product.add(new Product(name, description));
-  res.redirect('/products/new');
+exports.addProduct = async (req, res) => {
+  const { name, price } = req.body;
+  if (!name || !price || isNaN(price)) {
+    return res.status(400).send('Invalid product data');
+  }
+  await Product.add(name, parseFloat(price));
+  res.redirect('/');
 };
 
-const getNewProductView = (req, res) => {
-  const product = Product.getLast();
-  res.render('new-product', { product });
-};
-
-const getProductView = (req, res) => {
-  const product = Product.findByName(req.params.name);
-  res.render('product', { product });
-};
-
-const deleteProduct = (req, res) => {
-  Product.deleteByName(req.params.name);
-  res.status(STATUS_CODE.OK).json({ success: true });
-};
-
-module.exports = {
-  getProductsView,
-  getAddProductView,
-  addNewProduct,
-  getNewProductView,
-  getProductView,
-  deleteProduct
+exports.deleteProduct = async (req, res) => {
+  const productName = req.params.productName;
+  await Product.deleteByName(productName);
+  await Cart.deleteProductByName(productName);
+  res.redirect('/');
 };
