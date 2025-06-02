@@ -1,20 +1,23 @@
 const express = require('express');
-const app = express();
-const productsRoutes = require('./routing/products');
-const { connectToDb } = require('./utils/database');
+const mongoose = require('mongoose');
+const cors = require('cors');
 
+const bookRoutes = require('./routing/bookRoutes');     
+const authorRoutes = require('./routing/authorRoutes'); 
+
+const app = express();
+app.use(cors());
 app.use(express.json());
 
+app.use(bookRoutes);
+app.use(authorRoutes);
 
-app.use('/products', productsRoutes);
-
-
-connectToDb((err) => {
-  if (!err) {
-    app.listen(3000, () => {
-      console.log('Сервер працює на http://localhost:3000');
-    });
-  } else {
-    console.error('Помилка підключення до бази даних:', err);
-  }
+mongoose.connect('mongodb://localhost:27017/lab9', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log('Połączono z MongoDB');
+  app.listen(3000, () => console.log('Serwer działa na porcie 3000'));
+}).catch(err => {
+  console.error('Błąd połączenia z MongoDB:', err);
 });
